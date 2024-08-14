@@ -3,23 +3,9 @@
 -- Forum: https://www.reddit.com/r/lunarvim/
 -- Discord: https://discord.com/invite/Xb9B4Ny
 
+reload("config.options")
+
 -- start general pojok code
-local options = {
-  backspace = vim.opt.backspace + { "nostop" }, -- Don't stop backspace at insert
-  clipboard = "unnamedplus",                    -- Connection to the system clipboard
-  cmdheight = 0,                                -- hide command line unless needed
-  tabstop = 2,                                  -- Number of space in a tab
-  wrap = true,                                  -- Disable wrapping of lines longer than the width of window
-  relativenumber = true,
-  shiftwidth = 2,
-  breakindent = true,
-  autoindent = true,
-  linebreak = true,
-}
-for k, v in pairs(options) do
-  vim.opt[k] = v
-end
-vim.o.shell = "/bin/zsh"
 vim.opt.shortmess:append("c")                         -- don't give |ins-completion-menu| messages
 vim.opt.iskeyword:append("-")                         -- hyphenated words recognized by searches
 vim.opt.formatoptions:remove({ "c", "r", "o" })       -- don't insert the current comment leader automatically for auto-wrapping comments using 'textwidth', hitting <Enter> in insert mode, or hitting 'o' or 'O' in normal mode.
@@ -27,9 +13,10 @@ vim.opt.runtimepath:remove("/usr/share/vim/vimfiles") -- separate vim plugins fr
 vim.opt.title = true
 vim.opt.titlestring = "%<%F%=%l/%L - Irkham's Code"
 -- end general pojok code
-vim.g.codeium_enabled = false
+vim.g.codeium_enabled = true
 -- keymaps
 -- add by pojok code
+
 lvim.keys.visual_mode["J"] = ":move '>+1<CR>gv-gv"
 lvim.keys.visual_mode["K"] = ":move '<-2<CR>gv-gv"
 lvim.keys.visual_mode["<A-j>"] = ":move '>+1<CR>gv-gv"
@@ -58,10 +45,17 @@ lvim.keys.normal_mode["q"] = "<cmd>q<cr>"
 -- general
 lvim.log.level = "warn"
 lvim.format_on_save.enabled = true
-lvim.colorscheme = "kanagawa"
-lvim.transparent_window = true
+-- lvim.format_on_save = {
+
+--   pattern = { "*.php", "*.js", "*.ts", "*.css", "*.scss", "*.html", "*.json" }
+-- }
+lvim.format_on_save.timeout = 5000
+lvim.colorscheme = "default"
+lvim.transparent_window = false
+lvim.lsp.null_ls.setup.timeout_ms = 5000
 
 local map = vim.keymap.set
+
 map("i", "jk", "<ESC>")
 map("i", "JK", "<ESC>")
 -- lvim.builtin.lualine.style = "default" -- or "none"
@@ -69,9 +63,11 @@ lvim.builtin.lualine.sections.lualine_a = { "mode" }
 lvim.builtin.lualine.sections.lualine_b = { "branch" }
 lvim.builtin.lualine.sections.lualine_c = { "diff", "filename" }
 lvim.builtin.nvimtree.setup.view.relativenumber = true
+lvim.builtin.nvimtree.setup.view.number = true
 lvim.builtin.nvimtree.setup.filters.custom = {}
 lvim.builtin.nvimtree.setup.view.adaptive_size = false
 lvim.builtin.project.manual_mode = true
+lvim.builtin.nvimtree.active = true
 lvim.keys.normal_mode["|"] = ":vsplit<CR>"
 lvim.keys.normal_mode["-"] = ":split<CR>"
 lvim.builtin.which_key.mappings["t"] = {
@@ -80,6 +76,7 @@ lvim.builtin.which_key.mappings["t"] = {
   v = { "<cmd>2ToggleTerm size=10 direction=vertical<cr>", "Split vertical" },
   h = { "<cmd>2ToggleTerm size=10 direction=horizontal<cr>", "Split horizontal" },
 }
+lvim.builtin.breadcrumbs.active = false
 
 -- added by irkham
 lvim.plugins = {
@@ -147,16 +144,49 @@ lvim.plugins = {
     event = "BufReadPre",
     config = function()
       require("persistence").setup({
-        dir = vim.fn.expand(vim.fn.stdpath "state" .. "/sessions/"),
-        options = { "buffers", "curdir", "tabpages", "winsize" }
+        dir = vim.fn.expand(vim.fn.stdpath("state") .. "/sessions/"),
+        options = { "buffers", "curdir", "tabpages", "winsize" },
       })
-    end
+    end,
   },
   {
-    "sainnhe/everforest"
+    "sainnhe/everforest",
+  },
+  {
+    "Bekaboo/dropbar.nvim",
+    -- optional, but required for fuzzy finder support
+    dependencies = {
+      "nvim-telescope/telescope-fzf-native.nvim",
+    },
+  },
+  {
+    "nanozuki/tabby.nvim",
+    -- event = 'VimEnter', -- if you want lazy load, see below
+    dependencies = "nvim-tree/nvim-web-devicons",
+    config = function()
+      -- configs...
+    end,
+  },
+  { "StanAngeloff/php.vim" },
+  { "phpactor/phpactor",           branch = "master", ft = "php", build = "composer install --no-dev -o" },
+  { "vim-php/tagbar-phpctags.vim" },
+  { "rafamadriz/friendly-snippets" },
+  { "lunarvim/horizon.nvim" },
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+      "MunifTanjim/nui.nvim",
+      -- "3rd/image.nvim", -- Optional image support in preview window: See `# Preview Mode` for more information
+    }
   }
-
 }
+require("luasnip/loaders/from_vscode").load({
+  paths = { "~/.local/share/lunarvim/site/pack/packer/start/friendly-snippets" },
+})
+require("luasnip.loaders.from_lua").load({ paths = "~/.config/lvim/snippets" })
 -- alpha-config.lua
 lvim.builtin.alpha.dashboard.section.header.val = {
   [[   ⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣴⣶⣶⣶⣶⣶⠶⣶⣤⣤⣀⠀⠀⠀⠀⠀⠀ ]],
@@ -235,9 +265,13 @@ lvim.builtin.cmp.mapping = {
 
 local formatters = require("lvim.lsp.null-ls.formatters")
 formatters.setup({
-  -- { command = "stylua",          filetype = { "lua" } },
-  { command = "prettier" },
-  { command = "blade_formatter", filetype = { "php", "blade", "blade.php" } },
+  { command = "stylua", filetype = { "lua" } },
+  {
+    command = "prettier",
+    extra_args = { "--plugin=@prettier/plugin-php" },
+    filetypes = { "php" },
+  },
+  { name = "phpcbf",    filetypes = { "php" } },
 })
 
 -- lsp installer
@@ -248,12 +282,18 @@ lvim.lsp.installer.setup.ensure_installed = {
   "cssls",
   "emmet_ls",
   "tailwindcss",
+  "intelephense",
+}
+lvim.builtin.treesitter.ensure_installed = {
+  "php",
 }
 
 require("lvim.lsp.manager").setup("tailwindcss")
 require("lvim.lsp.manager").setup("emmet_ls")
 require("lvim.lsp.manager").setup("eslint")
 require("lvim.lsp.manager").setup("lua_ls")
+require("lvim.lsp.manager").setup("intelephense")
+require("lvim.lsp.manager").setup("phpactor")
 
 local colors = {
   color2 = "#0f1419",
@@ -290,3 +330,37 @@ lvim.builtin.lualine.options.theme = {
     b = { fg = colors.color4, bg = colors.color5 },
   },
 }
+
+lvim.lsp.automatic_configuration.skipped_servers = vim.tbl_filter(function(server)
+  return server ~= "intelephense"
+end, lvim.lsp.automatic_configuration.skipped_servers)
+
+-- lvim.builtin.which_key.mappings["P"] = {
+--   name = "PHP",
+--   i = { "<cmd>PhpactorImportClass<cr>", "Import Class" },
+--   e = { "<cmd>PhpactorClassExpand<cr>", "Expand Class" },
+--   u = { "<cmd>PhpactorImportMissingClasses<cr>", "Import Missing Classes" },
+--   r = { "<cmd>PhpactorReloadFile<cr>", "Reload File" },
+--   t = { "<cmd>PhpactorTransform<cr>", "Transform" },
+-- }
+
+-- local linters = require "lvim.lsp.null-ls.linters"
+-- linters.setup {
+--   { command = "phpcs", filetypes = { "php" } },
+-- }
+
+local null_ls = require("null-ls")
+
+-- local sources = {
+-- 	null_ls.builtins.formatting.prettier,
+-- 	null_ls.builtins.formatting.eslint_d,
+-- 	null_ls.builtins.formatting.stylua,
+-- 	null_ls.builtins.diagnostics.eslint_d,
+-- 	null_ls.builtins.code_actions.eslint_d,
+
+-- }
+
+-- null_ls.register({ sources = sources })
+
+-- enable html snippet in php files
+require("luasnip").filetype_extend("php", { "html" })
