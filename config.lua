@@ -5,22 +5,25 @@
 
 -- start general pojok code
 local options = {
-    backspace = vim.opt.backspace + { "nostop" }, -- Don't stop backspace at insert
-    clipboard = "unnamedplus",                    -- Connection to the system clipboard
-    cmdheight = 0,                                -- hide command line unless needed
-    tabstop = 2,                                  -- Number of space in a tab
-    wrap = true,                                  -- Disable wrapping of lines longer than the width of window
-    relativenumber = true,
-    shiftwidth = 4,
-    breakindent = true,
-    autoindent = true,
-    linebreak = true,
-    cursorline = false,
-    expandtab = true
+  backspace = vim.opt.backspace + { "nostop" }, -- Don't stop backspace at insert
+  clipboard = "unnamedplus",                    -- Connection to the system clipboard
+  cmdheight = 0,                                -- hide command line unless needed
+  tabstop = 4,                                  -- Number of space in a tab
+  wrap = true,                                  -- Disable wrapping of lines longer than the width of window
+  relativenumber = true,
+  shiftwidth = 2,
+  breakindent = true,
+  autoindent = true,
+  linebreak = true,
+  cursorline = false,
+  expandtab = true
 }
 for k, v in pairs(options) do
-    vim.opt[k] = v
+  vim.opt[k] = v
 end
+vim.opt.foldmethod = "expr"                           -- default is "normal"
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"       -- default is ""
+vim.opt.foldenable = false                            -- if this option is true and fold method option is other than normal, every time a document is opened everything will be folded.
 vim.o.shell = "/bin/zsh"
 vim.opt.shortmess:append("c")                         -- don't give |ins-completion-menu| messages
 vim.opt.iskeyword:append("-")                         -- hyphenated words recognized by searches
@@ -78,184 +81,185 @@ lvim.builtin.project.manual_mode = true
 lvim.keys.normal_mode["|"] = ":vsplit<CR>"
 lvim.keys.normal_mode["-"] = ":split<CR>"
 lvim.builtin.which_key.mappings["t"] = {
-    name = "+Terminal",
-    f = { "<cmd>ToggleTerm<cr>", "Floating terminal" },
-    v = { "<cmd>2ToggleTerm size=10 direction=vertical<cr>", "Split vertical" },
-    h = { "<cmd>2ToggleTerm size=10 direction=horizontal<cr>", "Split horizontal" },
+  name = "+Terminal",
+  f = { "<cmd>ToggleTerm<cr>", "Floating terminal" },
+  v = { "<cmd>2ToggleTerm size=10 direction=vertical<cr>", "Split vertical" },
+  h = { "<cmd>2ToggleTerm size=10 direction=horizontal<cr>", "Split horizontal" },
 }
+lvim.builtin.which_key.setup.plugins.presets.z = true
 
 -- added by irkham
 lvim.plugins = {
-    { "ellisonleao/gruvbox.nvim" },
-    { "mg979/vim-visual-multi" },
-    {
-        "CRAG666/code_runner.nvim",
-        dependencies = "nvim-lua/plenary.nvim",
-        config = function()
-            require("config.coderunner")
-        end,
+  { "ellisonleao/gruvbox.nvim" },
+  { "mg979/vim-visual-multi" },
+  {
+    "CRAG666/code_runner.nvim",
+    dependencies = "nvim-lua/plenary.nvim",
+    config = function()
+      require("config.coderunner")
+    end,
+  },
+  {
+    "NvChad/nvim-colorizer.lua",
+    config = function()
+      require("config.colorizer")
+    end,
+  },
+  {
+    "andrewferrier/wrapping.nvim",
+  },
+  {
+    "Exafunction/codeium.vim",
+    event = "BufEnter",
+    config = function()
+      vim.keymap.set("i", "<C-a>", function()
+        return vim.fn["codeium#Accept"]()
+      end, { expr = true, silent = true })
+    end,
+  },
+  { "rebelot/kanagawa.nvim" },
+  {
+    "epwalsh/obsidian.nvim",
+    version = "*", -- recommended, use latest release instead of latest commit
+    lazy = true,
+    ft = "markdown",
+    -- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
+    -- event = {
+    --   -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
+    --   -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/**.md"
+    --   "BufReadPre path/to/my-vault/**.md",
+    --   "BufNewFile path/to/my-vault/**.md",
+    -- },
+    dependencies = {
+      -- Required.
+      "nvim-lua/plenary.nvim",
+      -- see below for full list of optional dependencies 👇
     },
-    {
-        "NvChad/nvim-colorizer.lua",
-        config = function()
-            require("config.colorizer")
-        end,
+  },
+  {
+    "epwalsh/pomo.nvim",
+    version = "*", -- Recommended, use latest release instead of latest commit
+    lazy = true,
+    cmd = { "TimerStart", "TimerRepeat" },
+    dependencies = {
+      -- Optional, but highly recommended if you want to use the "Default" timer
+      "rcarriga/nvim-notify",
     },
-    {
-        "andrewferrier/wrapping.nvim",
+    opts = {
+      -- See below for full list of options 👇
     },
-    {
-        "Exafunction/codeium.vim",
-        event = "BufEnter",
-        config = function()
-            vim.keymap.set("i", "<C-a>", function()
-                return vim.fn["codeium#Accept"]()
-            end, { expr = true, silent = true })
-        end,
-    },
-    { "rebelot/kanagawa.nvim" },
-    {
-        "epwalsh/obsidian.nvim",
-        version = "*", -- recommended, use latest release instead of latest commit
-        lazy = true,
-        ft = "markdown",
-        -- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
-        -- event = {
-        --   -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
-        --   -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/**.md"
-        --   "BufReadPre path/to/my-vault/**.md",
-        --   "BufNewFile path/to/my-vault/**.md",
-        -- },
-        dependencies = {
-            -- Required.
-            "nvim-lua/plenary.nvim",
-            -- see below for full list of optional dependencies 👇
-        },
-    },
-    {
-        "epwalsh/pomo.nvim",
-        version = "*", -- Recommended, use latest release instead of latest commit
-        lazy = true,
-        cmd = { "TimerStart", "TimerRepeat" },
-        dependencies = {
-            -- Optional, but highly recommended if you want to use the "Default" timer
-            "rcarriga/nvim-notify",
-        },
-        opts = {
-            -- See below for full list of options 👇
-        },
-    },
-    {
-        "folke/persistence.nvim",
-        event = "BufReadPre",
-        config = function()
-            require("persistence").setup({
-                dir = vim.fn.expand(vim.fn.stdpath("state") .. "/sessions/"),
-                options = { "buffers", "curdir", "tabpages", "winsize" },
-            })
-        end,
-    },
-    {
-        "sainnhe/everforest",
-    },
-    {
-        'barrett-ruth/live-server.nvim',
-        build = 'npm install -g live-server',
-        cmd = { 'LiveServerStart', 'LiveServerStop' },
-        config = true
-    }
+  },
+  {
+    "folke/persistence.nvim",
+    event = "BufReadPre",
+    config = function()
+      require("persistence").setup({
+        dir = vim.fn.expand(vim.fn.stdpath("state") .. "/sessions/"),
+        options = { "buffers", "curdir", "tabpages", "winsize" },
+      })
+    end,
+  },
+  {
+    "sainnhe/everforest",
+  },
+  {
+    'barrett-ruth/live-server.nvim',
+    build = 'npm install -g live-server',
+    cmd = { 'LiveServerStart', 'LiveServerStop' },
+    config = true
+  }
 }
 -- alpha-config.lua
 lvim.builtin.alpha.dashboard.section.header.val = {
-    [[   ⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣴⣶⣶⣶⣶⣶⠶⣶⣤⣤⣀⠀⠀⠀⠀⠀⠀ ]],
-    [[ ⠀⠀⠀⠀⠀⠀⠀⢀⣤⣾⣿⣿⣿⠁⠀⢀⠈⢿⢀⣀⠀⠹⣿⣿⣿⣦⣄⠀⠀⠀ ]],
-    [[ ⠀⠀⠀⠀⠀⠀⣴⣿⣿⣿⣿⣿⠿⠀⠀⣟⡇⢘⣾⣽⠀⠀⡏⠉⠙⢛⣿⣷⡖⠀ ]],
-    [[ ⠀⠀⠀⠀⠀⣾⣿⣿⡿⠿⠷⠶⠤⠙⠒⠀⠒⢻⣿⣿⡷⠋⠀⠴⠞⠋⠁⢙⣿⣄ ]],
-    [[ ⠀⠀⠀⠀⢸⣿⣿⣯⣤⣤⣤⣤⣤⡄⠀⠀⠀⠀⠉⢹⡄⠀⠀⠀⠛⠛⠋⠉⠹⡇ ]],
-    [[ ⠀⠀⠀⠀⢸⣿⣿⠀⠀⠀⣀⣠⣤⣤⣤⣤⣤⣤⣤⣼⣇⣀⣀⣀⣛⣛⣒⣲⢾⡷ ]],
-    [[ ⢀⠤⠒⠒⢼⣿⣿⠶⠞⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠁⠀⣼⠃ ]],
-    [[ ⢮⠀⠀⠀⠀⣿⣿⣆⠀⠀⠻⣿⡿⠛⠉⠉⠁⠀⠉⠉⠛⠿⣿⣿⠟⠁⠀⣼⠃⠀ ]],
-    [[ ⠈⠓⠶⣶⣾⣿⣿⣿⣧⡀⠀⠈⠒⢤⣀⣀⡀⠀⠀⣀⣀⡠⠚⠁⠀⢀⡼⠃⠀⠀ ]],
-    [[ ⠀⠀⠀⠈⢿⣿⣿⣿⣿⣿⣷⣤⣤⣤⣤⣭⣭⣭⣭⣭⣥⣤⣤⣤⣴⣟⠁    ]],
-    [[                                ]],
+  [[   ⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣴⣶⣶⣶⣶⣶⠶⣶⣤⣤⣀⠀⠀⠀⠀⠀⠀ ]],
+  [[ ⠀⠀⠀⠀⠀⠀⠀⢀⣤⣾⣿⣿⣿⠁⠀⢀⠈⢿⢀⣀⠀⠹⣿⣿⣿⣦⣄⠀⠀⠀ ]],
+  [[ ⠀⠀⠀⠀⠀⠀⣴⣿⣿⣿⣿⣿⠿⠀⠀⣟⡇⢘⣾⣽⠀⠀⡏⠉⠙⢛⣿⣷⡖⠀ ]],
+  [[ ⠀⠀⠀⠀⠀⣾⣿⣿⡿⠿⠷⠶⠤⠙⠒⠀⠒⢻⣿⣿⡷⠋⠀⠴⠞⠋⠁⢙⣿⣄ ]],
+  [[ ⠀⠀⠀⠀⢸⣿⣿⣯⣤⣤⣤⣤⣤⡄⠀⠀⠀⠀⠉⢹⡄⠀⠀⠀⠛⠛⠋⠉⠹⡇ ]],
+  [[ ⠀⠀⠀⠀⢸⣿⣿⠀⠀⠀⣀⣠⣤⣤⣤⣤⣤⣤⣤⣼⣇⣀⣀⣀⣛⣛⣒⣲⢾⡷ ]],
+  [[ ⢀⠤⠒⠒⢼⣿⣿⠶⠞⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠁⠀⣼⠃ ]],
+  [[ ⢮⠀⠀⠀⠀⣿⣿⣆⠀⠀⠻⣿⡿⠛⠉⠉⠁⠀⠉⠉⠛⠿⣿⣿⠟⠁⠀⣼⠃⠀ ]],
+  [[ ⠈⠓⠶⣶⣾⣿⣿⣿⣧⡀⠀⠈⠒⢤⣀⣀⡀⠀⠀⣀⣀⡠⠚⠁⠀⢀⡼⠃⠀⠀ ]],
+  [[ ⠀⠀⠀⠈⢿⣿⣿⣿⣿⣿⣷⣤⣤⣤⣤⣭⣭⣭⣭⣭⣥⣤⣤⣤⣴⣟⠁    ]],
+  [[                                ]],
 }
 
 local function footer()
-    return "Irkham's Code"
+  return "Irkham's Code"
 end
 
 lvim.builtin.alpha.dashboard.section.footer.val = footer()
 -- override cmp
 local check_backspace = function()
-    local col = vim.fn.col(".") - 1
-    return col == 0 or vim.fn.getline("."):sub(col, col):match("%s")
+  local col = vim.fn.col(".") - 1
+  return col == 0 or vim.fn.getline("."):sub(col, col):match("%s")
 end
 
 local luasnip = require("luasnip")
 local cmp = require("cmp")
 lvim.builtin.cmp.mapping = {
-    ["<Up>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
-    ["<Down>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
-    ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-    ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
-    ["<C-k>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-    ["<C-j>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
-    ["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(-1), { "i", "c" }),
-    ["<C-f>"] = cmp.mapping(cmp.mapping.scroll_docs(1), { "i", "c" }),
-    ["<C-Space>"] = cmp.mapping(cmp.mapping.complete(), { "i", "c" }),
-    ["<C-y>"] = cmp.config.disable,
-    ["<C-e>"] = cmp.mapping({
-        i = cmp.mapping.abort(),
-        c = cmp.mapping.close(),
-    }),
-    ["<CR>"] = cmp.mapping.confirm({ select = true }),
-    ["<Tab>"] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-            cmp.select_next_item()
-        elseif luasnip.expandable() then
-            luasnip.expand()
-        elseif luasnip.expand_or_jumpable() then
-            luasnip.expand_or_jump()
-        elseif check_backspace() then
-            fallback()
-        else
-            fallback()
-        end
-    end, {
-        "i",
-        "s",
-    }),
+  ["<Up>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
+  ["<Down>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
+  ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+  ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+  ["<C-k>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+  ["<C-j>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+  ["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(-1), { "i", "c" }),
+  ["<C-f>"] = cmp.mapping(cmp.mapping.scroll_docs(1), { "i", "c" }),
+  ["<C-Space>"] = cmp.mapping(cmp.mapping.complete(), { "i", "c" }),
+  ["<C-y>"] = cmp.config.disable,
+  ["<C-e>"] = cmp.mapping({
+    i = cmp.mapping.abort(),
+    c = cmp.mapping.close(),
+  }),
+  ["<CR>"] = cmp.mapping.confirm({ select = true }),
+  ["<Tab>"] = cmp.mapping(function(fallback)
+    if cmp.visible() then
+      cmp.select_next_item()
+    elseif luasnip.expandable() then
+      luasnip.expand()
+    elseif luasnip.expand_or_jumpable() then
+      luasnip.expand_or_jump()
+    elseif check_backspace() then
+      fallback()
+    else
+      fallback()
+    end
+  end, {
+    "i",
+    "s",
+  }),
 
-    ["<S-Tab>"] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-            cmp.select_prev_item()
-        elseif luasnip.jumpable(-1) then
-            luasnip.jump(-1)
-        else
-            fallback()
-        end
-    end, {
-        "i",
-        "s",
-    }),
+  ["<S-Tab>"] = cmp.mapping(function(fallback)
+    if cmp.visible() then
+      cmp.select_prev_item()
+    elseif luasnip.jumpable(-1) then
+      luasnip.jump(-1)
+    else
+      fallback()
+    end
+  end, {
+    "i",
+    "s",
+  }),
 }
 -- end override cmp
 
 local formatters = require("lvim.lsp.null-ls.formatters")
 formatters.setup({
-    -- { command = "stylua",          filetype = { "lua" } },
-    { command = "prettier" },
-    { command = "blade_formatter", filetype = { "php", "blade", "blade.php" } },
+  -- { command = "stylua",          filetype = { "lua" } },
+  { command = "prettier" },
+  { command = "blade_formatter", filetype = { "php", "blade", "blade.php" } },
 })
 
 -- lsp installer
 lvim.lsp.installer.setup.ensure_installed = {
-    "jsonls",
-    "lua_ls",
-    "html",
-    "cssls",
-    "emmet_ls",
-    "tailwindcss",
+  "jsonls",
+  "lua_ls",
+  "html",
+  "cssls",
+  "emmet_ls",
+  "tailwindcss",
 }
 
 require("lvim.lsp.manager").setup("tailwindcss")
@@ -263,37 +267,37 @@ require("lvim.lsp.manager").setup("emmet_ls")
 require("lvim.lsp.manager").setup("lua_ls")
 
 local colors = {
-    color2 = "#0f1419",
-    color3 = "#ffee99",
-    color4 = "#e6e1cf",
-    color5 = "#14191f",
-    color13 = "#b8cc52",
-    color10 = "#36a3d9",
-    color8 = "#f07178",
-    color9 = "#3e4b59",
+  color2 = "#0f1419",
+  color3 = "#ffee99",
+  color4 = "#e6e1cf",
+  color5 = "#14191f",
+  color13 = "#b8cc52",
+  color10 = "#36a3d9",
+  color8 = "#f07178",
+  color9 = "#3e4b59",
 }
 
 lvim.builtin.lualine.options.theme = {
-    normal = {
-        c = { fg = colors.color8, bg = colors.color2 },
-        a = { fg = colors.color5, bg = colors.color13, gui = "bold" },
-        b = { fg = colors.color4, bg = colors.color5 },
-    },
-    insert = {
-        a = { fg = colors.color2, bg = colors.color13, gui = "bold" },
-        b = { fg = colors.color4, bg = colors.color5 },
-    },
-    visual = {
-        a = { fg = colors.color2, bg = colors.color3, gui = "bold" },
-        b = { fg = colors.color4, bg = colors.color5 },
-    },
-    replace = {
-        a = { fg = colors.color2, bg = colors.color8, gui = "bold" },
-        b = { fg = colors.color4, bg = colors.color5 },
-    },
-    inactive = {
-        c = { fg = colors.color4, bg = colors.color2 },
-        a = { fg = colors.color4, bg = colors.color5, gui = "bold" },
-        b = { fg = colors.color4, bg = colors.color5 },
-    },
+  normal = {
+    c = { fg = colors.color8, bg = colors.color2 },
+    a = { fg = colors.color5, bg = colors.color13, gui = "bold" },
+    b = { fg = colors.color4, bg = colors.color5 },
+  },
+  insert = {
+    a = { fg = colors.color2, bg = colors.color13, gui = "bold" },
+    b = { fg = colors.color4, bg = colors.color5 },
+  },
+  visual = {
+    a = { fg = colors.color2, bg = colors.color3, gui = "bold" },
+    b = { fg = colors.color4, bg = colors.color5 },
+  },
+  replace = {
+    a = { fg = colors.color2, bg = colors.color8, gui = "bold" },
+    b = { fg = colors.color4, bg = colors.color5 },
+  },
+  inactive = {
+    c = { fg = colors.color4, bg = colors.color2 },
+    a = { fg = colors.color4, bg = colors.color5, gui = "bold" },
+    b = { fg = colors.color4, bg = colors.color5 },
+  },
 }
