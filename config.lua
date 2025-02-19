@@ -33,6 +33,9 @@ vim.opt.title = true
 vim.opt.titlestring = "%<%F%=%l/%L - Irkham's Code"
 -- end general pojok code
 vim.g.codeium_enabled = false
+vim.g.vimtex_view_method = "general"
+vim.g.vimtex_view_general_viewer = "/Applications/PDF\\ Expert.app/Contents/MacOS/PDF\\ Expert"
+vim.g.vimtex_view_general_options = "--args"
 -- keymaps
 -- add by pojok code
 lvim.keys.visual_mode["J"] = ":move '>+1<CR>gv-gv"
@@ -64,7 +67,7 @@ lvim.keys.normal_mode["q"] = "<cmd>q<cr>"
 -- general
 lvim.log.level = "warn"
 lvim.format_on_save.enabled = true
-lvim.colorscheme = "kanagawa"
+lvim.colorscheme = "gruvbox"
 lvim.transparent_window = false
 
 local map = vim.keymap.set
@@ -135,6 +138,15 @@ lvim.plugins = {
       "nvim-lua/plenary.nvim",
       -- see below for full list of optional dependencies 👇
     },
+    opts = {
+      workspaces = {
+        {
+          name = 'irkham',
+          path = '/Volumes/Mac_HD/obsidian'
+        }
+      },
+      ui = { enable = false }
+    }
   },
   {
     "epwalsh/pomo.nvim",
@@ -147,6 +159,58 @@ lvim.plugins = {
     },
     opts = {
       -- See below for full list of options 👇
+    },
+  },
+  {
+    "yetone/avante.nvim",
+    event = "VeryLazy",
+    lazy = false,
+    version = false, -- set this if you want to always pull the latest change
+    opts = {
+      -- add any opts here
+      provider = "openai",
+      auto_suggestion_provide = "copilot",
+      openai = {
+        model = "gpt-4o-mini",
+      }
+    },
+    -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
+    build = "make",
+    -- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false" -- for windows
+    dependencies = {
+      "stevearc/dressing.nvim",
+      "nvim-lua/plenary.nvim",
+      "MunifTanjim/nui.nvim",
+      --- The below dependencies are optional,
+      "hrsh7th/nvim-cmp",            -- autocompletion for avante commands and mentions
+      "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
+      -- "zbirenbaum/copilot.lua", -- for providers='copilot'
+      {
+        -- support for image pasting
+        "HakonHarnes/img-clip.nvim",
+        event = "VeryLazy",
+        opts = {
+          -- recommended settings
+          default = {
+            embed_image_as_base64 = false,
+            prompt_for_file_name = false,
+            drag_and_drop = {
+              insert_mode = true,
+            },
+            -- required for Windows users
+            use_absolute_path = true,
+          },
+        },
+      },
+      {
+        -- Make sure to set this up properly if you have lazy=true
+        'MeanderingProgrammer/render-markdown.nvim',
+        enabled = true,
+        opts = {
+          file_types = { "markdown", "Avante" },
+        },
+        ft = { "markdown", "Avante" },
+      },
     },
   },
   {
@@ -167,7 +231,26 @@ lvim.plugins = {
     build = 'npm install -g live-server',
     cmd = { 'LiveServerStart', 'LiveServerStop' },
     config = true
+  },
+  {
+    "lervag/vimtex"
+  },
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
+    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
+    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
+    opts = {},
+  },
+  {
+    "iamcco/markdown-preview.nvim",
+    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+    ft = { "markdown" },
+    build = function() vim.fn["mkdp#util#install"]() end,
   }
+
 }
 -- alpha-config.lua
 lvim.builtin.alpha.dashboard.section.header.val = {
@@ -301,3 +384,21 @@ lvim.builtin.lualine.options.theme = {
     b = { fg = colors.color4, bg = colors.color5 },
   },
 }
+
+local lspconfig = require("lspconfig")
+lspconfig.texlab.setup({
+  settings = {
+    texlab = {
+      build = {
+        executable = "latexmk",
+        args = { "-pdf", "-interaction=nonstopmode", "-synctex=1", "%f" },
+        forwardSearchAfter = false,
+        onSave = true,
+      },
+      forwardSearch = {
+        executable = "/Applications/PDF\\ Expert.app/Content/MacOS/PDF\\ Expert",
+        args = { "--synctex-forward", "%l:1:%f", "%p" },
+      },
+    },
+  },
+})
