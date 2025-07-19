@@ -32,7 +32,7 @@ vim.opt.runtimepath:remove("/usr/share/vim/vimfiles") -- separate vim plugins fr
 vim.opt.title = true
 vim.opt.titlestring = "%<%F%=%l/%L - Irkham's Code"
 -- end general pojok code
-vim.g.codeium_enabled = false
+vim.g.codeium_enabled = true
 vim.g.vimtex_view_method = "general"
 vim.g.vimtex_view_general_viewer = "/Applications/PDF\\ Expert.app/Contents/MacOS/PDF\\ Expert"
 vim.g.vimtex_view_general_options = "--args"
@@ -94,6 +94,18 @@ lvim.builtin.which_key.setup.plugins.presets.z = true
 -- added by irkham
 lvim.plugins = {
   { "ellisonleao/gruvbox.nvim" },
+  {
+    "olimorris/onedarkpro.nvim",
+    priority = 1000, -- Ensure it loads first
+  },
+  {
+    "slugbyte/lackluster.nvim",
+    lazy = false,
+    priority = 1000,
+    init = function()
+      vim.cmd.colorscheme "lackluster"
+    end
+  },
   { "mg979/vim-visual-multi" },
   {
     "CRAG666/code_runner.nvim",
@@ -196,7 +208,7 @@ lvim.plugins = {
     opts = {
       -- add any opts here
       provider = "gemini",
-      -- auto_suggestion_provide = "copilot",
+      auto_suggestion_provide = "gemini",
       -- openai = {
       --   model = "gpt-4o-mini",
       -- }
@@ -211,7 +223,7 @@ lvim.plugins = {
       --- The below dependencies are optional,
       "hrsh7th/nvim-cmp",            -- autocompletion for avante commands and mentions
       "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
-      -- "zbirenbaum/copilot.lua", -- for providers='copilot'
+      "zbirenbaum/copilot.lua",      -- for providers='copilot'
       {
         -- support for image pasting
         "HakonHarnes/img-clip.nvim",
@@ -276,8 +288,8 @@ lvim.plugins = {
     cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
     ft = { "markdown" },
     build = function() vim.fn["mkdp#util#install"]() end,
-  }
-
+  },
+  { "aca/emmet-ls" },
 }
 -- alpha-config.lua
 lvim.builtin.alpha.dashboard.section.header.val = {
@@ -323,7 +335,7 @@ lvim.builtin.cmp.mapping = {
     c = cmp.mapping.close(),
   }),
   ["<CR>"] = cmp.mapping.confirm({ select = true }),
-  ["<Tab>"] = cmp.mappiiiiiiiing(function(fallback)
+  ["<Tab>"] = cmp.mapping(function(fallback)
     if cmp.visible() then
       cmp.select_next_item()
     elseif luasnip.expandable() then
@@ -428,4 +440,7 @@ lspconfig.texlab.setup({
       },
     },
   },
+})
+lspconfig.emmet_ls.setup({
+  filetypes = { "html", "css", "javascript", "php" },
 })
