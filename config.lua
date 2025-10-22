@@ -18,6 +18,13 @@ local options = {
   cursorline = false,
   expandtab = true
 }
+
+vim.filetype.add({
+  extension = {
+    ejs = "html",
+  }
+})
+
 for k, v in pairs(options) do
   vim.opt[k] = v
 end
@@ -30,7 +37,7 @@ vim.opt.iskeyword:append("-")                         -- hyphenated words recogn
 vim.opt.formatoptions:remove({ "c", "r", "o" })       -- don't insert the current comment leader automatically for auto-wrapping comments using 'textwidth', hitting <Enter> in insert mode, or hitting 'o' or 'O' in normal mode.
 vim.opt.runtimepath:remove("/usr/share/vim/vimfiles") -- separate vim plugins from neovim in case vim still in use
 vim.opt.title = true
-vim.opt.titlestring = "%<%F%=%l/%L - Irkham's Code"
+-- vim.opt.titlestring = "%<%F%=%l/%L - Irkham's Code"
 -- end general pojok code
 vim.g.codeium_enabled = true
 vim.g.vimtex_view_method = "general"
@@ -67,7 +74,7 @@ lvim.keys.normal_mode["q"] = "<cmd>q<cr>"
 -- general
 lvim.log.level = "warn"
 lvim.format_on_save.enabled = true
-lvim.colorscheme = "gruvbox"
+lvim.colorscheme = "everforest"
 lvim.transparent_window = false
 
 local map = vim.keymap.set
@@ -208,11 +215,13 @@ lvim.plugins = {
     opts = {
       -- add any opts here
       provider = "gemini",
-      auto_suggestion_provide = "gemini",
+      auto_suggestion = false,
+      -- auto_suggestion_provide = "gemini",
       -- openai = {
       --   model = "gpt-4o-mini",
       -- }
     },
+    enabled = true,
     -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
     build = "make",
     -- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false" -- for windows
@@ -290,6 +299,39 @@ lvim.plugins = {
     build = function() vim.fn["mkdp#util#install"]() end,
   },
   { "aca/emmet-ls" },
+  {
+    "shellRaining/hlchunk.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    config = function()
+      require("hlchunk").setup({
+        chunk = {
+          enable = true,
+          chars = {
+            horizontal_line = "─",
+            vertical_line = "│",
+            left_top = "╭",
+            left_bottom = "╰",
+            right_arrow = ">",
+          },
+          style = "#806d9c",
+        },
+        blank = {
+          enable = true,
+          chars = {
+            " ",
+          },
+          style = {
+            { bg = "#434437" },
+            { bg = "#2f4440" },
+            { bg = "#433054" },
+            { bg = "#284251" },
+          },
+        },
+      })
+    end
+  },
+  { "nvzone/volt", lazy = true },
+  { "nvzone/menu", lazy = true },
 }
 -- alpha-config.lua
 lvim.builtin.alpha.dashboard.section.header.val = {
@@ -370,8 +412,9 @@ lvim.builtin.cmp.mapping = {
 local formatters = require("lvim.lsp.null-ls.formatters")
 formatters.setup({
   -- { command = "stylua",          filetype = { "lua" } },
-  { command = "prettier" },
+  -- { command = "prettier",        filetype = { "typescript", "typescriptreact", "javascript", "javascriptreact", "html", "css", "json", "scss", "less", "graphql", "ejs" } },
   { command = "blade_formatter", filetype = { "php", "blade", "blade.php" } },
+  { command = "eslint_d",        filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" } },
 })
 
 -- lsp installer
@@ -444,3 +487,20 @@ lspconfig.texlab.setup({
 lspconfig.emmet_ls.setup({
   filetypes = { "html", "css", "javascript", "php" },
 })
+-- HTML LSP
+require("lvim.lsp.manager").setup("html", {
+  filetypes = { "html", "ejs" }, -- add ejs
+})
+
+-- Emmet LSP
+require("lvim.lsp.manager").setup("emmet_ls", {
+  filetypes = { "html", "css", "javascriptreact", "typescriptreact", "javascript", "typescript", "ejs" },
+})
+
+lvim.builtin.treesitter.ensure_installed = {
+  "html",
+  "javascript",
+  "css",
+  "json",
+  "lua",
+}
